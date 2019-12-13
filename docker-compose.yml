@@ -1,0 +1,19 @@
+version: "2"
+services:
+  redis:
+    image: redis:3
+    container_name: perfload.redis
+    ports:
+      - 6379:6379
+    logging:
+      driver: none
+  redis-commander:
+    image: tenstartups/redis-commander
+    container_name: perfload.redis-commander
+    command: --redis-host redis
+    ports:
+      - 6380:8081
+    links:
+      - redis
+    logging:
+      driver: none
