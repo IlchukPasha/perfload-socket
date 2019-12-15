@@ -10,11 +10,23 @@ socket.on('connect', () => {
   let macA;
 
   for (let key in nI) {
+    // FOR TESTING!!!
+    macA = Math.floor(Math.random() * 3) + 1;
+    console.log('macA ', macA);
+    break;
+    // FOR TESTING!!!
+
     if (!nI[key][0].internal) {
-      macA = nI[key][0].mac;
+      if (nI[key][0].mac === '00:00:00:00:00:00') {
+        macA = Math.random().toString(36).substr(2,15);
+      } else {
+        macA = nI[key][0].mac;
+      }
       break;
     }
   }
+
+  socket.emit('clientAuth','node-client-key')
 
   performanceData().then(allPerformanceData => {
     allPerformanceData.macA = macA;
@@ -23,6 +35,7 @@ socket.on('connect', () => {
 
   let perfDataInterval = setInterval(() => {
     performanceData().then(allPerformanceData => {
+      allPerformanceData.macA = macA;
       socket.emit('perfData', allPerformanceData);
     });
   }, 1000);
@@ -48,8 +61,9 @@ function performanceData(){
     const numCores = cpus.length;
     const cpuSpeed = cpus[0].speed;
     const cpuLoad = await getCpuLoad();
+    const isActive = true;
 
-    resolve({ freeMem, totalMem, usedMem, memUseage, osType, upTime, cpuModel, numCores, cpuSpeed, cpuLoad });
+    resolve({ freeMem, totalMem, usedMem, memUseage, osType, upTime, cpuModel, numCores, cpuSpeed, cpuLoad, isActive });
   });
 }
 
@@ -84,7 +98,3 @@ function getCpuLoad(){
     }, 100);
   });
 }
-
-performanceData().then(allPerformanceData => {
-    console.log(allPerformanceData);
-});
